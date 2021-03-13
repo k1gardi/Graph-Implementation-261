@@ -1,6 +1,6 @@
 # Course: CS261 - Data Structures
-# Author:
-# Assignment:
+# Author: Kaewan Gardi
+# Assignment: 6
 # Description:
 
 class DirectedGraph:

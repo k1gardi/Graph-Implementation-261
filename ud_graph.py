@@ -1,6 +1,6 @@
-# Course: 
-# Author: 
-# Assignment: 
+# Course: CS261 - Data Structures
+# Author: Kaewan Gardi
+# Assignment: 6
 # Description:
 
 
