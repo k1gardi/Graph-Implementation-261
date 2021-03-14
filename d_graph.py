@@ -3,6 +3,9 @@
 # Assignment: 6
 # Description:
 
+import heapq
+from collections import deque
+
 class DirectedGraph:
     """
     Class to implement directed weighted graph
@@ -153,18 +156,87 @@ class DirectedGraph:
 
         return True
 
-
     def dfs(self, v_start, v_end=None) -> []:
         """
         TODO: Write this implementation
         """
-        pass
+        visited = set()
+        stack = []
+        path = []
+
+        # Check start exists
+        if v_start >= self.v_count:
+            return path
+
+        # Check if end exists
+        if v_end and v_end >= self.v_count:
+            v_end = None
+
+        # Do DFS
+        stack.append(v_start)
+        while stack:
+            v = stack.pop()
+
+            # Is this v_end?
+            if v is v_end:
+                path.append(v)
+                return path
+
+            # Have not visited v
+            if v not in visited:
+                visited.add(v)
+
+                # Push each to stack in reverse lexicographic
+                neighbors = [vertex for vertex in range(len(self.adj_matrix[v])) if self.adj_matrix[v][vertex] > 0]
+                neighbors.sort()
+                for index in range(len(neighbors) - 1, -1, -1):
+                    stack.append(neighbors[index])
+
+                path.append(v)
+
+        return path
+
+
 
     def bfs(self, v_start, v_end=None) -> []:
         """
         TODO: Write this implementation
         """
-        pass
+        visited = set()
+        queue = deque()
+        path = []
+
+        # Check start exists
+        if v_start >= self.v_count:
+            return path
+
+        # Check if end exists
+        if v_end and v_end >= self.v_count:
+            v_end = None
+
+        # Do BFS
+        queue.append(v_start)
+        while queue:
+            v = queue.popleft()
+
+            # Is this v_end?
+            if v is v_end:
+                path.append(v)
+                return path
+
+            if v not in visited:
+                visited.add(v)
+
+                # Push each to queue in lexicographic
+                neighbors = [vertex for vertex in range(len(self.adj_matrix[v])) if self.adj_matrix[v][vertex] > 0]
+                neighbors.sort()
+                for index in range(len(neighbors)):
+                    if neighbors[index] not in visited:
+                        queue.append(neighbors[index])
+
+                path.append(v)
+
+        return path
 
     def has_cycle(self):
         """
@@ -176,7 +248,31 @@ class DirectedGraph:
         """
         TODO: Write this implementation
         """
-        pass
+        # Initialize list of travel costs
+        distances = [float('inf')] * self.v_count
+
+        queue = []
+        heapq.heapify(queue)
+
+        # Items added to queue as (distance, vertex)
+        heapq.heappush(queue, (0, src))
+
+        while queue:
+            d, v = heapq.heappop(queue)
+
+            # Check vertex not visited
+            if distances[v] == float('inf'):
+                # Add v to visited
+                distances[v] = d
+
+                # Add neighbors to queue
+                neighbors = [vertex for vertex in range(len(self.adj_matrix[v])) if self.adj_matrix[v][vertex] > 0]
+                for neighbor in neighbors:
+                    delta_d = self.adj_matrix[v][neighbor]
+                    new_d = d + delta_d
+                    heapq.heappush(queue, (new_d, neighbor))
+
+        return distances
 
 
 if __name__ == '__main__':
@@ -205,17 +301,17 @@ if __name__ == '__main__':
     # g = DirectedGraph(edges)
     # print(g.get_edges(), g.get_vertices(), sep='\n')
     #
-
-    print("\nPDF - method is_valid_path() example 1")
-    print("--------------------------------------")
-    edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
-             (3, 1, 5), (2, 1, 23), (3, 2, 7)]
-    g = DirectedGraph(edges)
-    test_cases = [[0, 1, 4, 3], [1, 3, 2, 1], [0, 4], [4, 0], [], [2]]
-    for path in test_cases:
-        print(path, g.is_valid_path(path))
-
     #
+    # print("\nPDF - method is_valid_path() example 1")
+    # print("--------------------------------------")
+    # edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
+    #          (3, 1, 5), (2, 1, 23), (3, 2, 7)]
+    # g = DirectedGraph(edges)
+    # test_cases = [[0, 1, 4, 3], [1, 3, 2, 1], [0, 4], [4, 0], [], [2]]
+    # for path in test_cases:
+    #     print(path, g.is_valid_path(path))
+
+
     # print("\nPDF - method dfs() and bfs() example 1")
     # print("--------------------------------------")
     # edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
@@ -223,8 +319,8 @@ if __name__ == '__main__':
     # g = DirectedGraph(edges)
     # for start in range(5):
     #     print(f'{start} DFS:{g.dfs(start)} BFS:{g.bfs(start)}')
-    #
-    #
+
+
     # print("\nPDF - method has_cycle() example 1")
     # print("----------------------------------")
     # edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
@@ -243,14 +339,14 @@ if __name__ == '__main__':
     # print('\n', g)
     #
     #
-    # print("\nPDF - dijkstra() example 1")
-    # print("--------------------------")
-    # edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
-    #          (3, 1, 5), (2, 1, 23), (3, 2, 7)]
-    # g = DirectedGraph(edges)
-    # for i in range(5):
-    #     print(f'DIJKSTRA {i} {g.dijkstra(i)}')
-    # g.remove_edge(4, 3)
-    # print('\n', g)
-    # for i in range(5):
-    #     print(f'DIJKSTRA {i} {g.dijkstra(i)}')
+    print("\nPDF - dijkstra() example 1")
+    print("--------------------------")
+    edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
+             (3, 1, 5), (2, 1, 23), (3, 2, 7)]
+    g = DirectedGraph(edges)
+    for i in range(5):
+        print(f'DIJKSTRA {i} {g.dijkstra(i)}')
+    g.remove_edge(4, 3)
+    print('\n', g)
+    for i in range(5):
+        print(f'DIJKSTRA {i} {g.dijkstra(i)}')
