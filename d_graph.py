@@ -54,37 +54,105 @@ class DirectedGraph:
         """
         TODO: Write this implementation
         """
-        pass
+        # Add first index
+        if len(self.adj_matrix) < 1:
+            self.adj_matrix.append([0])
+            self.v_count += 1
+            return self.v_count
+
+        # Add 1 more row/column
+        self.adj_matrix.append([0] * self.v_count)
+        for row in self.adj_matrix:
+            row.append(0)
+
+        self.v_count += 1
+        return self.v_count
 
     def add_edge(self, src: int, dst: int, weight=1) -> None:
         """
         TODO: Write this implementation
         """
-        pass
+        # Check inputs
+        if src == dst:
+            return
+        if src < 0 or dst < 0:
+            return
+        if src >= self.v_count or dst >= self.v_count:
+            return
+        if weight <= 0:
+            return
+
+        self.adj_matrix[src][dst] = weight
 
     def remove_edge(self, src: int, dst: int) -> None:
         """
         TODO: Write this implementation
         """
-        pass
+        # Check inputs
+        if src == dst:
+            return
+        if src < 0 or dst < 0:
+            return
+        if src >= self.v_count or dst >= self.v_count:
+            return
+        if self.adj_matrix[src][dst] == 0:
+            return
+
+        self.adj_matrix[src][dst] = 0
 
     def get_vertices(self) -> []:
         """
         TODO: Write this implementation
         """
-        pass
+        return list(range(self.v_count))
 
     def get_edges(self) -> []:
         """
         TODO: Write this implementation
         """
-        pass
+        edges = []
+
+        for src in range(len(self.adj_matrix)):
+            for dst in range(len(self.adj_matrix[src])):
+                if self.adj_matrix[src][dst] > 0:
+                    edges.append((src, dst, self.adj_matrix[src][dst]))
+
+        return edges
 
     def is_valid_path(self, path: []) -> bool:
         """
         TODO: Write this implementation
         """
-        pass
+        # Check path of len 0 and 1
+        if len(path) == 0:
+            return True
+
+        if len(path) == 1:
+            if 0 <= path[0] < self.v_count:
+                return True
+            else:
+                return False
+
+        # Check longer paths
+        dst = path[0]
+        p_index = 1
+        while p_index < len(path):
+            src = dst
+            dst = path[p_index]
+            p_index += 1
+
+            # Check vertices exist
+            if src < 0 or dst < 0:
+                return False
+            if src >= self.v_count or dst >= self.v_count:
+                return False
+
+            # Check share an edge
+            if self.adj_matrix[src][dst] == 0:
+                return False
+
+        return True
+
 
     def dfs(self, v_start, v_end=None) -> []:
         """
@@ -113,30 +181,30 @@ class DirectedGraph:
 
 if __name__ == '__main__':
 
-    print("\nPDF - method add_vertex() / add_edge example 1")
-    print("----------------------------------------------")
-    g = DirectedGraph()
-    print(g)
-    for _ in range(5):
-        g.add_vertex()
-    print(g)
+    # print("\nPDF - method add_vertex() / add_edge example 1")
+    # print("----------------------------------------------")
+    # g = DirectedGraph()
+    # print(g)
+    # for _ in range(5):
+    #     g.add_vertex()
+    # print(g)
+    #
+    # edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
+    #          (3, 1, 5), (2, 1, 23), (3, 2, 7)]
+    # for src, dst, weight in edges:
+    #     g.add_edge(src, dst, weight)
+    # print(g)
 
-    edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
-             (3, 1, 5), (2, 1, 23), (3, 2, 7)]
-    for src, dst, weight in edges:
-        g.add_edge(src, dst, weight)
-    print(g)
 
-
-    print("\nPDF - method get_edges() example 1")
-    print("----------------------------------")
-    g = DirectedGraph()
-    print(g.get_edges(), g.get_vertices(), sep='\n')
-    edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
-             (3, 1, 5), (2, 1, 23), (3, 2, 7)]
-    g = DirectedGraph(edges)
-    print(g.get_edges(), g.get_vertices(), sep='\n')
-
+    # print("\nPDF - method get_edges() example 1")
+    # print("----------------------------------")
+    # g = DirectedGraph()
+    # print(g.get_edges(), g.get_vertices(), sep='\n')
+    # edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
+    #          (3, 1, 5), (2, 1, 23), (3, 2, 7)]
+    # g = DirectedGraph(edges)
+    # print(g.get_edges(), g.get_vertices(), sep='\n')
+    #
 
     print("\nPDF - method is_valid_path() example 1")
     print("--------------------------------------")
@@ -147,42 +215,42 @@ if __name__ == '__main__':
     for path in test_cases:
         print(path, g.is_valid_path(path))
 
-
-    print("\nPDF - method dfs() and bfs() example 1")
-    print("--------------------------------------")
-    edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
-             (3, 1, 5), (2, 1, 23), (3, 2, 7)]
-    g = DirectedGraph(edges)
-    for start in range(5):
-        print(f'{start} DFS:{g.dfs(start)} BFS:{g.bfs(start)}')
-
-
-    print("\nPDF - method has_cycle() example 1")
-    print("----------------------------------")
-    edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
-             (3, 1, 5), (2, 1, 23), (3, 2, 7)]
-    g = DirectedGraph(edges)
-
-    edges_to_remove = [(3, 1), (4, 0), (3, 2)]
-    for src, dst in edges_to_remove:
-        g.remove_edge(src, dst)
-        print(g.get_edges(), g.has_cycle(), sep='\n')
-
-    edges_to_add = [(4, 3), (2, 3), (1, 3), (4, 0)]
-    for src, dst in edges_to_add:
-        g.add_edge(src, dst)
-        print(g.get_edges(), g.has_cycle(), sep='\n')
-    print('\n', g)
-
-
-    print("\nPDF - dijkstra() example 1")
-    print("--------------------------")
-    edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
-             (3, 1, 5), (2, 1, 23), (3, 2, 7)]
-    g = DirectedGraph(edges)
-    for i in range(5):
-        print(f'DIJKSTRA {i} {g.dijkstra(i)}')
-    g.remove_edge(4, 3)
-    print('\n', g)
-    for i in range(5):
-        print(f'DIJKSTRA {i} {g.dijkstra(i)}')
+    #
+    # print("\nPDF - method dfs() and bfs() example 1")
+    # print("--------------------------------------")
+    # edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
+    #          (3, 1, 5), (2, 1, 23), (3, 2, 7)]
+    # g = DirectedGraph(edges)
+    # for start in range(5):
+    #     print(f'{start} DFS:{g.dfs(start)} BFS:{g.bfs(start)}')
+    #
+    #
+    # print("\nPDF - method has_cycle() example 1")
+    # print("----------------------------------")
+    # edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
+    #          (3, 1, 5), (2, 1, 23), (3, 2, 7)]
+    # g = DirectedGraph(edges)
+    #
+    # edges_to_remove = [(3, 1), (4, 0), (3, 2)]
+    # for src, dst in edges_to_remove:
+    #     g.remove_edge(src, dst)
+    #     print(g.get_edges(), g.has_cycle(), sep='\n')
+    #
+    # edges_to_add = [(4, 3), (2, 3), (1, 3), (4, 0)]
+    # for src, dst in edges_to_add:
+    #     g.add_edge(src, dst)
+    #     print(g.get_edges(), g.has_cycle(), sep='\n')
+    # print('\n', g)
+    #
+    #
+    # print("\nPDF - dijkstra() example 1")
+    # print("--------------------------")
+    # edges = [(0, 1, 10), (4, 0, 12), (1, 4, 15), (4, 3, 3),
+    #          (3, 1, 5), (2, 1, 23), (3, 2, 7)]
+    # g = DirectedGraph(edges)
+    # for i in range(5):
+    #     print(f'DIJKSTRA {i} {g.dijkstra(i)}')
+    # g.remove_edge(4, 3)
+    # print('\n', g)
+    # for i in range(5):
+    #     print(f'DIJKSTRA {i} {g.dijkstra(i)}')
